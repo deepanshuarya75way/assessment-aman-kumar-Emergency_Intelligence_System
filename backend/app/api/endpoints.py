@@ -34,6 +34,8 @@ from app.services.decision_engine import decision_engine
 from app.services.simulation import simulation_service
 from app.utils.video_feed import video_feed
 
+from app.services.forecasting import forecasting_service
+
 router = APIRouter()
 
 # ─────────────────────────────── HEALTH ───────────────────────────────
@@ -98,6 +100,21 @@ async def upload_video(file: UploadFile = File(...)):
     video_feed.set_video_file(path)
     await storage_service.log_event("upload", f"file={file.filename}")
     return {"message": f"Video uploaded: {file.filename}", "source": video_feed.source_type}
+
+
+@router.get("/forecasts")
+async def get_forecasts():
+    return {
+        "forecasts": forecasting_service.get_latest()
+    }
+
+@router.get("forecasts/history")
+async def get_forecast_history():
+    forecasts = await storage_service.get_recent_forecasts(50)
+    return {
+        "forecasts" : forecasts
+    }
+
 
 # ──────────────────────── RTSP / URL STREAM ───────────────────────────
 
