@@ -164,7 +164,6 @@ function App() {
           videoSource={status?.services?.video_source || 'mock'}
         />
 
-        <ForecastPanel forecasts={forecasts} />
 
         {/* Left Column: Input Selector + Video + Heatmap */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -173,6 +172,7 @@ function App() {
           <HeatmapGrid densities={densities} />
         </div>
 
+      <ForecastPanel forecasts={forecasts} />
         {/* Right Column: Alerts + Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <AlertPanel alerts={alerts} />

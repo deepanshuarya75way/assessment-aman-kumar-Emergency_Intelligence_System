@@ -24,7 +24,7 @@ export default function ForecastPanel ({forecasts = {}}){
 
               </div>
 
-              {zoe.status ==="collectinng_data" && (
+              {zone.status ==="collectinng_data" && (
                 <p>
                   Collecting data:
                   {" "}
@@ -71,17 +71,15 @@ export default function ForecastPanel ({forecasts = {}}){
                               Confidence:
                               {" "}
                               {Math.round(
-                                predicted.confidence*100
+                                prediction.confidence*100
                               )}%
                               </div>
                             </div>
-
                     )
                   )}
                   </div>
               )}
               </div>
-
       ))}
       </div>
   );
