@@ -7,6 +7,7 @@ import ControlPanel from './components/ControlPanel';
 import StatsBar from './components/StatsBar';
 import InputSelector from './components/InputSelector';
 import { fetchStatus, fetchAlerts, createWebSocket } from './services/api';
+import ForecastPanel from "./components/ForecastPanel";
 
 function App() {
   const [status, setStatus] = useState(null);
@@ -15,6 +16,7 @@ function App() {
   const [wsConnected, setWsConnected] = useState(false);
   const [clock, setClock] = useState('');
   const [systemLevel, setSystemLevel] = useState('normal');
+  const [forecasts, setForecasts] = useState({});
   const wsRef = useRef(null);
 
   // Clock
@@ -42,6 +44,30 @@ function App() {
     poll();
     const id = setInterval(poll, 5000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const fetchForecasts = async () => {
+      try{
+        const response = await fetch(
+          "http://localhost:8000/forecasts"
+        );
+
+        const data = await response.json();
+        setForecasts(
+          data.forecasts || {}
+        );
+      }
+      catch(error){
+        console.error("Failed to fetch forecasts:",error);
+      }
+    };
+    fetchForecasts();
+    const interval = setInterval(
+      fetchForecasts,
+      5000
+    );
+    return () => clearInterval(interval);
   }, []);
 
   // Fetch initial alerts
@@ -137,6 +163,8 @@ function App() {
           wsConnected={wsConnected}
           videoSource={status?.services?.video_source || 'mock'}
         />
+
+        <ForecastPanel forecasts={forecasts} />
 
         {/* Left Column: Input Selector + Video + Heatmap */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
