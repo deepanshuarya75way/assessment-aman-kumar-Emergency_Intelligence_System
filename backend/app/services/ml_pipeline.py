@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from typing import Tuple, Dict, List, Any, Optional
 from app.core.config import settings
+from app.services.forecasting import forecasting_service
 
 
 class MLPipeline:
@@ -96,6 +97,14 @@ class MLPipeline:
         from app.services.decision_engine import decision_engine
         alerts = decision_engine.analyze(zone_densities)
 
+        forecasts = forecasting_service.update(zone_densities)
+
+        predictive_alerts = decision_engine.analyze_forecasts(
+            forecasts
+        )
+
+        alerts.extend(predictive_alerts)
+
         return annotated, zone_densities, alerts
 
     def detect_single(self, frame: np.ndarray) -> Dict[str, Any]:
@@ -108,6 +117,7 @@ class MLPipeline:
             "total_people": sum(densities.values()),
             "zone_densities": densities,
             "alerts": alerts,
+            "forecasts": forecasts,
             "annotated_frame_b64": b64,
         }
 
