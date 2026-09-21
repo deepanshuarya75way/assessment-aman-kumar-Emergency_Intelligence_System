@@ -53,3 +53,24 @@ class ForecastingService:
           "samples" : len(history),
           "predictions":[]
         }
+
+        continue
+      
+      forecast = self._forecast_zone(
+        zone,
+        history,
+        zone_densities[zone]
+      )
+
+      forecasts[zone] = forecast
+
+    self.latest_forecasts = forecasts
+
+    return forecasts 
+
+  def get_latest(self):
+    return self.latest_forecasts
+  
+  forecasting_service = ForecastingService()
+
+  
