@@ -112,8 +112,8 @@ class MLPipeline:
         """Run detection on a single frame and return JSON-friendly results."""
         annotated, densities, alerts = self.process_frame(frame)
         forecasts = forecasting_service.get_latest()
-        await storage_service.save_density(densities)
-        await storage_service.save_forecast(forecasts)
+        # await storage_service.save_density(densities)
+        # await storage_service.save_forecast(forecasts)
         _, buf = cv2.imencode('.jpg', annotated, [cv2.IMWRITE_JPEG_QUALITY, 85])
         import base64
         b64 = base64.b64encode(buf).decode('utf-8')

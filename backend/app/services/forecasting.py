@@ -71,6 +71,5 @@ class ForecastingService:
   def get_latest(self):
     return self.latest_forecasts
   
-  forecasting_service = ForecastingService()
+forecasting_service = ForecastingService()
 
-  

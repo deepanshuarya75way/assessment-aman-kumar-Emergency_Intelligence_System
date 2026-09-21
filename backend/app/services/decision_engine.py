@@ -51,8 +51,8 @@ class DecisionEngine:
 
     def analyze_forecasts(self, forecasts):
 
-        if not settings.PREDICTIVE_ALERT_ENABLED:
-            return []
+        # if not settings.PREDICTIVE_ALERT_ENABLED:
+        #     return []
 
         alerts = []
 
@@ -61,45 +61,54 @@ class DecisionEngine:
         for zone, forecast in forecasts.items():
 
             if forecast.get("status") != "forecast_available":
-                continu
+                continue
             
             predictions = forecast.get("predictions" , [])
 
+            level = forecast.get("level","info")
+            action = forecast.get(
+                "action",
+                f"Predicted congestion in {zone}."
+            )
+            key = f"{zone}_{level}"
+
+            last = self._predictive_cooldowns.get(key, 0)
+
             for prediction in predictions:
-                predicted = prediction["predicted"]
-                minutes_ahead = prediction["minutes_ahead"]
+                # predicted = prediction["predicted"]
+                # minutes_ahead = prediction["minutes_ahead"]
 
-                level = None
-                action = ""
+                # level = None
+                # action = ""
 
-                if predicted >= self.DENSITY_CRITICAL:
-                    level = "critical"
+                # if predicted >= self.DENSITY_CRITICAL:
+                #     level = "critical"
 
-                    action = (
-                        f"Predictive critical in {zone} within"
-                        f" approx {minutes_ahead} minutes."
-                    )
+                #     action = (
+                #         f"Predictive critical in {zone} within"
+                #         f" approx {minutes_ahead} minutes."
+                #     )
 
-                elif predicted >= self.DENSITY_WARNING:
-                    level = "warning"
+                # elif predicted >= self.DENSITY_WARNING:
+                #     level = "warning"
 
-                    action = (
-                        f"Predictive elevated density in {zone} "
-                        f"in {minutes_ahead} minutes."
-                    )
-                if level is None:
-                    continue
+                #     action = (
+                #         f"Predictive elevated density in {zone} "
+                #         f"in {minutes_ahead} minutes."
+                #     )
+                # if level is None:
+                #     continue
 
-                key = f"{zone}_{level}"
+                # key = f"{zone}_{level}"
 
-                last = self._predictive_cooldowns.get(key, 0)
+                # last = self._predictive_cooldowns.get(key, 0)
 
                 if now - last < self.PREDICTIVE_COOLDOWN_SECS:
                     continue
                 
                 alert = {
                     "id" : f"predictive-{int(now*1000)}-{zone}",
-                    "timestamp": now.
+                    "timestamp": now,
                     "zone": zone,
                     "level": level,
                     "type":"predictive",
