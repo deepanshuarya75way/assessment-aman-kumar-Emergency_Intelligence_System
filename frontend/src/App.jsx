@@ -172,7 +172,7 @@ function App() {
           <HeatmapGrid densities={densities} />
         </div>
 
-      <ForecastPanel forecasts={forecasts} />
+        <ForecastPanel forecasts={forecasts} />
         {/* Right Column: Alerts + Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <AlertPanel alerts={alerts} />
