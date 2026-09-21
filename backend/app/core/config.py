@@ -4,6 +4,7 @@ Centralized configuration — all settings read from environment variables.
 import os
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from typing import ClassVar
 
 load_dotenv()
 
@@ -40,17 +41,17 @@ class Settings(BaseModel):
 
     # ___ Forecasting ___
 
-    FORECAST_HORIZONS = [5,10,15]
+    FORECAST_HORIZONS : ClassVar[list[int]] = [5,10,15]
 
-    FORECAST_HISTORY_SIZE = 60
+    FORECAST_HISTORY_SIZE : ClassVar[int] = 60
 
-    FORECAST_MIN_SAMPLES = 5
+    FORECAST_MIN_SAMPLES : ClassVar[int] = 5
 
-    FORECAST_SAMPLE_INTERVAL = 5
+    FORECAST_SAMPLE_INTERVAL : ClassVar[int] = 5
 
-    PREDICTIVE_ALERT = True
+    PREDICTIVE_ALERT : ClassVar[bool] = True
 
-    FORECAST_THRESHOLD_CHANGE = 2
+    FORECAST_THRESHOLD_CHANGE : ClassVar[int] = 2
 
     class Config:
         env_file = ".env"
