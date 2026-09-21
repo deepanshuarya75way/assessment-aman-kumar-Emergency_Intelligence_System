@@ -123,6 +123,7 @@ class DecisionEngine:
 
                 self._predictive_cooldowns[key] = now
                 break
+                
             return alerts
  
     def simulate_alert(self, zone: str, level: str) -> Dict[str, Any]:

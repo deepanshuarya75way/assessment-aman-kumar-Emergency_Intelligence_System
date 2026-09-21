@@ -104,7 +104,8 @@ class MLPipeline:
             forecasts
         )
 
-        alerts.extend(predictive_alerts)
+        if predictive_alerts:
+            alerts.extend(predictive_alerts)
 
         return annotated, zone_densities, alerts
 

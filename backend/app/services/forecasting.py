@@ -68,6 +68,104 @@ class ForecastingService:
 
     return forecasts 
 
+  def _forecast_zone(
+    self,
+    zone:str,
+    history:list[float],
+    current: int
+  ) -> dict[str, Any]:
+
+    # values = history[-20:]
+
+    if not history:
+      return{
+        "zone":zone,
+        "current":current,
+        "status":"insufficient_data",
+        "samples" : 0,
+        "predictions": []
+      }
+
+    values = [
+      float(item[1])
+      for item in history[-20:]
+    ]
+
+    if not values:
+      return {
+        "zone":zone,
+        "current":current,
+        "status":"insufficient_data",
+        "samples" : 0,
+        "predictions": []
+      }
+
+    if len(values)>= 2:
+      first = values[0]
+      last = values[-1]
+      trend = (last-first)/(len(values)-1)
+    else:
+      trend = 0.0
+
+    predictions = []
+
+    horizons = getattr(
+      settings,
+      "FORECAST_HORIZONS",
+      [5,10, 15]
+    )
+
+    if len(values) >= 2:
+        mean = sum(values) / len(values)
+        variance = sum(
+          (x-mean)**2 
+          for x in values
+        )/len(values)
+        std = variance ** 0.5
+      
+    else:
+      std = 0.0
+
+    margin = max(std, 1.0)
+
+    for horizon in horizons:
+      predicted = max(
+        0,
+        float(values[-1]) + trend * horizon
+      )
+
+      
+      lower = max(
+        0.0,
+        predicted - margin
+      )
+
+      upper = predicted + margin
+
+      confidence = max(
+        0.5,
+        min(
+          0.99,
+          1.0 - (margin / max(predicted, 1.0))
+        )
+      )
+
+      predictions.append({
+        "horizon":horizon,
+        "prediction": round(predicted,2),
+        "lower": round(lower,2),
+        "upper" : round(upper, 2),
+        "confidence": round(confidence, 2)
+      })
+
+      return {
+        "zone" : zone,
+        "current": current,
+        "status" : "forecasting",
+        "samples" : len(history),
+        "predictions" : predictions
+      }
+
   def get_latest(self):
     return self.latest_forecasts
   
