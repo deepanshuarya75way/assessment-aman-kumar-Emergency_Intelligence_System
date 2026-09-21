@@ -916,6 +916,40 @@ body {
 .forecast-zone{
   margin-bottom:20px;
   padding:16px;
-  border radius:10px;
-  
+  border-radius:10px;
+  background: #06b6d4;
+}
+
+.forecast-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom: 15px;
+}
+
+.forecast-header h3{
+  margin: 0;
+}
+
+.forecast-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px
+}
+
+.forecast-card{
+  padding: 15px;
+  border-radius:8px;
+  background :rgb(63, 230, 233);
+  border: 1px solid var(--accent-green);
+}
+
+.forecast-value{
+  font-size: 28px;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+.forecast-empty{
+  opacity: 0.7;
 }

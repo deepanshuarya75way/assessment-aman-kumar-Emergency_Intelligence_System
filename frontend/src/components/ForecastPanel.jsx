@@ -1,13 +1,13 @@
 import react from "react";
 
 export default function ForecastPanel ({forecasts = {}}){
-  const zones = bject.values(forecasts);
+  const zones = Object.values(forecasts);
   return(
     <div className = "forecast-panel">
       <h2> Predictive crowd forecast</h2>
 
       {zones.length ==0 && (
-        <p classname = "forecast-empty">
+        <p className = "forecast-empty">
           Collecting ....
           </p>
       )}
