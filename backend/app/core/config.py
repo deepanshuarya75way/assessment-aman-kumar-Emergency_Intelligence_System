@@ -37,6 +37,20 @@ class Settings(BaseModel):
     UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
     STREAM_FPS: int = int(os.getenv("STREAM_FPS", "10"))
 
+    # ___ Forecasting ___
+
+    FORECAST_HORIZONS = [5,10,15]
+
+    FORECAST_HISTORY_SIZE = 60
+
+    FORECAST_MIN_SAMPLES = 5
+
+    FORECAST_SAMPLE_INTERVAL = 5
+
+    PREDICTIVE_ALERT = True
+
+    FORECAST_THRESHOLD_CHANGE = 2
+
     class Config:
         env_file = ".env"
 
