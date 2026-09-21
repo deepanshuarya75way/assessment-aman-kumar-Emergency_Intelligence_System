@@ -21,6 +21,9 @@ class StorageService:
         self._mem_heatmap: Optional[Dict[str, Any]] = None
         self._mem_events: List[Dict[str, Any]] = []
 
+        self._mem_density_history = []
+        self._mem_forecasts = []
+
         self._init_mongo()
         self._init_redis()
 
@@ -94,6 +97,81 @@ class StorageService:
             self._mem_events.append(event)
             if len(self._mem_events) > 500:
                 self._mem_events = self._mem_events[-500:]
+
+    async def save_density(self,zone_densities: Dict[str,int]):
+
+        timestamp = time.time()
+
+        records = []
+
+        for zone, density in zone_densities.items():
+            records.append({
+                "timestamp":timestamp,
+                "zone":zone,
+                "density":density
+            })
+
+        if self.db is not None:
+            try:
+                if records:
+                    await self.db["density_history"].insert_many(
+                        records
+                    )
+
+                return 
+
+            except Exception as e:
+                print(
+                    f"[Storage] Density history save failed: {e}"
+                )
+
+        self._mem_density_history.extend(record)
+
+        if len(self._mem_density_history) > 5000:
+            self._mem_density_history= (
+                self._mem_density_history[-5000:]
+            )
+
+    async def save_forecast(self, forecasts:Dict[str,Any]):
+
+        record = {
+            "timestamp": time.time(),
+            "forecasts": forecasts
+        }
+
+        if self.db is not None:
+
+            try:
+                await self.db["forecast_history"].insert_one(record)
+                return
+
+            except Exception as e:
+                print(f"[Storage] Forecast save failed: {e}")
+
+        self._mem_forecasts.append(record)
+
+        if len(self._mem_forecasts)>1000:
+            self._mem_forecasts = (
+                self._mem_forecasts[-1000:]
+            )
+
+    
+    async def get_recent_forecasts(self, limit: int = 50):
+        if self.db is None:
+            try:
+                cursor = (
+                    self.db["forecast_history"]
+                    .find({}, {"_id":0})
+                    .sort("timestamp",-1)
+                    .limit(limit)
+                )
+
+                return await cursor.to_list(length = limit)
+
+            except Exception as e :
+                print(f"[Storage] forecast failed: {e}")
+
+        return list(reversed(self._mem_forecasts[-limit:]))
 
     # ── Health ──
     def health(self) -> Dict[str, str]:
