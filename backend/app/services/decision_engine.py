@@ -15,6 +15,8 @@ class DecisionEngine:
         self.DENSITY_CRITICAL = settings.DENSITY_CRITICAL
         self._cooldowns: Dict[str, float] = {}
         self.COOLDOWN_SECS = 15  # suppress duplicate alerts for this long
+        self._predictive_cooldowns = {}
+        self.PREDICTIVE_COOLDOWN_SECS = 60
 
     def analyze(self, zone_densities: Dict[str, int]) -> List[Dict[str, Any]]:
         alerts: List[Dict[str, Any]] = []
@@ -47,6 +49,73 @@ class DecisionEngine:
 
         return alerts
 
+    def analyze_forecasts(self, forecasts):
+
+        if not settings.PREDICTIVE_ALERT_ENABLED:
+            return []
+
+        alerts = []
+
+        now = time.time()
+
+        for zone, forecast in forecasts.items():
+
+            if forecast.get("status") != "forecast_available":
+                continu
+            
+            predictions = forecast.get("predictions" , [])
+
+            for prediction in predictions:
+                predicted = prediction["predicted"]
+                minutes_ahead = prediction["minutes_ahead"]
+
+                level = None
+                action = ""
+
+                if predicted >= self.DENSITY_CRITICAL:
+                    level = "critical"
+
+                    action = (
+                        f"Predictive critical in {zone} within"
+                        f" approx {minutes_ahead} minutes."
+                    )
+
+                elif predicted >= self.DENSITY_WARNING:
+                    level = "warning"
+
+                    action = (
+                        f"Predictive elevated density in {zone} "
+                        f"in {minutes_ahead} minutes."
+                    )
+                if level is None:
+                    continue
+
+                key = f"{zone}_{level}"
+
+                last = self._predictive_cooldowns.get(key, 0)
+
+                if now - last < self.PREDICTIVE_COOLDOWN_SECS:
+                    continue
+                
+                alert = {
+                    "id" : f"predictive-{int(now*1000)}-{zone}",
+                    "timestamp": now.
+                    "zone": zone,
+                    "level": level,
+                    "type":"predictive",
+                    "count":predicted,
+                    "confidence":prediction["confidence"],
+                    "lower_bound":prediction["lower"],
+                    "upper_bound":prediction["upper"],
+                    "action":action
+                }
+
+                alerts.append(alert)
+
+                self._predictive_cooldowns[key] = now
+                break
+            return alerts
+ 
     def simulate_alert(self, zone: str, level: str) -> Dict[str, Any]:
         """Create a manual/simulated alert (bypasses cooldown)."""
         now = time.time()
