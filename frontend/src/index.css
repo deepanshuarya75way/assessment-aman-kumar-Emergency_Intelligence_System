@@ -899,3 +899,23 @@ body {
   text-align: center;
   animation: fadeIn 0.2s ease both;
 }
+
+
+.forecast-panel{
+  margin-top: 20px;
+  padding:20px;
+  border-radius:12px;
+  background: #ffffff ;
+  border : 1px solid gray;
+}
+
+.forecast-panel h2{
+  margin-bottom: 20px;
+}
+
+.forecast-zone{
+  margin-bottom:20px;
+  padding:16px;
+  border radius:10px;
+  
+}
